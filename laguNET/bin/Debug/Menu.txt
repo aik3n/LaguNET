@@ -1,0 +1,3 @@
+Adaptadores, ncpa.cpl
+Redes conocidas, start ms-settings:network-wifisettings
+Recibir BT, fsquirt.exe -receive

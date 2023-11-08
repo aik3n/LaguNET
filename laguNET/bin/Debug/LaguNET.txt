@@ -1,0 +1,14 @@
+MenuItem1=LaguNET Config
+MenuItem2=Adaptadores de red
+MenuItem3=Redes conocidas
+MenuItem4=Recibir BT
+MenuItem5=Carpeta Scripts
+MenuItem6=Salir
+Text1=Adaptador
+Text2=IP
+Text3=Mask
+Text4=Conectar red
+Text5=Test Ping
+Button1=Crear Script
+Button2=Save
+Button3=EXE

@@ -1,0 +1,12 @@
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNET.csproj.AssemblyReference.cache
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNETv0.AboutBox1.resources
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNETv0.Form1.resources
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNETv0.Form2.resources
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNET.csproj.GenerateResource.cache
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNET.csproj.CoreCompileInputs.cache
+Z:\D\sam\LaguNET\laguNET\bin\Debug\laguNET.exe.config
+Z:\D\sam\LaguNET\laguNET\bin\Debug\laguNET.exe
+Z:\D\sam\LaguNET\laguNET\bin\Debug\laguNET.pdb
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNET.Properties.Resources.resources
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNET.exe
+Z:\D\sam\LaguNET\laguNET\obj\Debug\laguNET.pdb

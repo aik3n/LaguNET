@@ -1,0 +1,11 @@
+Z:\D\sam\LaguNET\laguNETvDev\bin\Release\laguNETv0.exe.config
+Z:\D\sam\LaguNET\laguNETvDev\bin\Release\laguNETv0.exe
+Z:\D\sam\LaguNET\laguNETvDev\bin\Release\laguNETv0.pdb
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.csproj.AssemblyReference.cache
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.Form1.resources
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.Form2.resources
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.Properties.Resources.resources
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.csproj.GenerateResource.cache
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.csproj.CoreCompileInputs.cache
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.exe
+Z:\D\sam\LaguNET\laguNETvDev\obj\Release\laguNETv0.pdb
