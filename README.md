@@ -12,6 +12,8 @@ NombreMenu, Comando de consola deseado.
 Para crear una tarea programada para iniciar la aplcacion con el inicio de sesion de usuario ejecutar como administrador "Crear tarea programada.bat",
 de igual manera para eliminar la tarea ejecutar "Eliminar tarea programada.bat"
 
+Aplicacion complidada y lista para usar en "..\laguNET\bin\Debug"
+
 Enjoy!
 
 
