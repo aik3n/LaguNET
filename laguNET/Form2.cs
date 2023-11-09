@@ -146,18 +146,19 @@ namespace laguNETv0
             if (File.Exists(path))
             {
                 resetColor(treeView1.Nodes);
-                treeView1.SelectedNode.BackColor = Color.LightCoral;
+                //treeView1.SelectedNode.BackColor = Color.LightCoral;
                 string s = sDirIP.Replace(":: testPing=", "");
-                label1.Text = s;
+                label1.Text = "Ping: " + s;
                 
                 //label1.BackColor = Color.LightCoral;
-                //label1.Visible = true;
+                label1.Visible = true;
                 exeScript(path);
                 if(ValidateIPv4(s))
                     timer1.Start();
                 else
                 {
                     treeView1.SelectedNode.BackColor = Color.SkyBlue;
+                    label1.Text = "IP no valida: " + s;
                     label1.BackColor = Color.Yellow;
                 }
                     
@@ -190,12 +191,12 @@ namespace laguNETv0
             PingReply RespuestaPing;
 
             string sDireccion = sDirIP.Replace(":: testPing=", ""); //sDireccion = "192.168.249.101"; // RM1   //sDireccion = "8.8.8.8"; // www.google.es
-            label1.Text = "Ping("+intentos+"): " + sDireccion;
+            label1.Text = "Ping: " + sDireccion; //label1.Text = "Ping("+intentos+"): " + sDireccion;
             if (intentos++ < 17)
             {
                 if (ValidateIPv4(sDireccion))
                 {
-                    //label1.Visible = true; // la quito por estetica
+                    label1.Visible = true; // la quito por estetica
                     progressBar1.Visible = true;
                     progressBar1.Value = intentos;
                     try
@@ -204,20 +205,20 @@ namespace laguNETv0
                         if (RespuestaPing.Status == IPStatus.Success)
                         {
                             treeView1.SelectedNode.BackColor = Color.LightGreen;
-                            label1.BackColor = Color.LightGreen;//
+                            //label1.BackColor = Color.LightGreen;//
                             timer1.Stop();
                             timerClose.Start();
                         }
                         else
                         {
                             treeView1.SelectedNode.BackColor = Color.Khaki;
-                            label1.BackColor = Color.Coral;//
+                            //label1.BackColor = Color.Coral;//
                         }
                     }
                     catch (Exception ex)
                     {
                         treeView1.SelectedNode.BackColor = Color.Khaki;
-                        label1.BackColor = Color.Coral; //
+                        //label1.BackColor = Color.Coral; //
                     }
                 }
             }
