@@ -40,6 +40,8 @@
             // 
             // treeView1
             // 
+            this.treeView1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.treeView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.treeView1.Font = new System.Drawing.Font("Verdana", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
@@ -62,7 +64,7 @@
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(0, 431);
+            this.label1.Location = new System.Drawing.Point(0, 423);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(303, 19);
             this.label1.TabIndex = 3;
@@ -77,7 +79,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(0, 424);
+            this.progressBar1.Location = new System.Drawing.Point(0, 444);
             this.progressBar1.Maximum = 17;
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(303, 5);

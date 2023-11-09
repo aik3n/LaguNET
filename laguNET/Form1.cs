@@ -17,6 +17,14 @@ using System.Collections.ObjectModel;
 using System.Xml.Linq;
 using System.Windows.Documents;
 using System.Reflection;
+using System.Threading;
+using System.Windows.Shell;
+
+using System.Runtime.InteropServices;
+using System.Windows.Data;
+//using System.Windows;
+
+
 
 namespace laguNETv0
 {
@@ -24,10 +32,12 @@ namespace laguNETv0
     {
         private ContextMenu m_menu;
         MenuStrip strip = new MenuStrip();
+
         public Form1()
         {
             InitializeComponent();
             StartPosition = FormStartPosition.CenterScreen;
+            
         }
 
 
@@ -54,6 +64,7 @@ namespace laguNETv0
            
             string dir = Application.StartupPath + "\\scripts";
             ListDirectory(treeViewScripts,dir);
+
 
         }
 
@@ -90,15 +101,6 @@ namespace laguNETv0
                 treeViewScripts.SelectedNode.BackColor = Color.SkyBlue;
             }
         }
-        private static void EventoElapsed(object sender, EventArgs e) 
-        {
-
-
-        }
-        private void menuAdaptadores(object sender, EventArgs e)
-        {
-            cmdCommand("/c ncpa.cpl");
-        }
 
         private void cmdCommand(string strCmd)
         {
@@ -129,30 +131,6 @@ namespace laguNETv0
             //}
         }
 
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
-        {
-
-
-        }
-
-
-
-        protected void Exit_Click(Object sender, System.EventArgs e)
-        {
-            Close();
-            
-            
-        }
-        protected void Hide_Click(Object sender, System.EventArgs e)
-        {
-            Hide();
-        }
-        protected void Show_Click(Object sender, System.EventArgs e)
-        {
-            WindowState = FormWindowState.Normal;
-            Show();
-           
-        }
 
         private void Form1_Resize(object sender, EventArgs e)
         {
@@ -173,49 +151,24 @@ namespace laguNETv0
         private void buttonCrear_Click(object sender, EventArgs e)
         {
             string s, b, l;
-            richTextBoxScript.Text = "";
 
             if (radioButtonDHCP.Checked)
-            {
-                //s = "netsh interface ipv4 set address name=\"" + textBoxNiName.Text + "\" source=dhcp";
                 s = "netsh interface ipv4 set address name=\"" + comboBoxAdaptador.Text + "\" source=dhcp";
-
-            }
-            else {
-                //s = "netsh interface ipv4 set address name=\"" + textBoxNiName.Text + "\" static " + textBoxNiIp.Text + " " + textBoxNiMask.Text;
+            else
                 s = "netsh interface ipv4 set address name=\"" + comboBoxAdaptador.Text + "\" static " + textBoxNiIp.Text + " " + textBoxNiMask.Text;
 
-            }
-            richTextBoxScript.AppendText(s + "\n");
-
-
             if (checkBoxConectar.Checked)
-            {
                 b = "netsh wlan connect name =\"" + comboBoxSSID.Text + "\" ssid =\"" + comboBoxSSID.Text + "\"";
-            }
             else 
-            {
                 b = ":: No conectar ";
-            }
 
-            richTextBoxScript.AppendText(b + "\n");
             if (checkBoxTestPing.Checked) 
-            { 
                 l = ":: testPing=" + textBoxTestPing.Text;
-            } 
             else 
-            {
                 l = ":: No test Ping";
-            }
-            richTextBoxScript.AppendText(l);
 
+            richTextBoxScript.Text = s + "\n" + b + "\n" + l;
 
-        }
-
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-            
         }
 
         private void radioButtonDHCP_CheckedChanged(object sender, EventArgs e)
@@ -224,7 +177,6 @@ namespace laguNETv0
             textBoxNiMask.Enabled = !radioButtonDHCP.Checked;
             textBoxNiIp.BackColor = Color.White;
             textBoxNiMask.BackColor = Color.White;
-
         }
 
         private void buttonGuardar_Click(object sender, EventArgs e)
@@ -238,20 +190,15 @@ namespace laguNETv0
                 Filter = "Batch script|*.bat|Texto plano|*.txt",
                 Title = "Guardar script",
                 InitialDirectory = Application.StartupPath + "\\scripts",
-            };
+                };
 
-            //saveFileDialog1.Filter = "Batch script|*.bat|Texto plano|*.txt";
-            //saveFileDialog1.Title = "Guardar script";
-
-            //saveFileDialog1.InitialDirectory = Application.StartupPath + "\\scripts";
             saveFileDialog1.ShowDialog();
-
 
             if (saveFileDialog1.FileName.ToString() != "") 
             { 
-            StreamWriter sw = new StreamWriter(saveFileDialog1.FileName.ToString());         
-            sw.WriteLine(richTextBoxScript.Text); //Write a line of text
-            sw.Close(); //Close the file
+                StreamWriter sw = new StreamWriter(saveFileDialog1.FileName.ToString());         
+                sw.WriteLine(richTextBoxScript.Text); //Write a line of text
+                sw.Close(); //Close the file
             }
             ListDirectory(treeViewScripts, dir);
 
@@ -298,39 +245,6 @@ namespace laguNETv0
             }
 
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            ProcessStartInfo psi = new ProcessStartInfo("cmd.exe");
-            psi.UseShellExecute = true;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.Verb = "runas";
-            psi.Arguments = "/c netsh wlan show profiles";
-            psi.RedirectStandardOutput = true;
-            psi.UseShellExecute = false;
-            Process.Start(psi);
-
-
-            var p = Process.Start(psi);
-            //p.WaitForExit();
-
-            var output = p.StandardOutput
-                .ReadToEnd()
-                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries))
-                .Where(split => split.Length > 1)
-                .Select(split => split[1].Trim());
-
-            var listaSSID = new ObservableCollection<string>(output);
-            comboBoxSSID.Items.Clear();            //comboBoxSSID.DataSource = null;
-            comboBoxSSID.ResetText();
-            foreach (string s in listaSSID)
-            {
-                comboBoxSSID.Items.Add(s);
-            }
-            comboBoxSSID.SelectedIndex = 0;            //MessageBox.Show(reseaux[1]);
-        }
-
 
         private void listaAdapatadores() {
             List<string> AdapterList = new List<string>();
@@ -345,28 +259,6 @@ namespace laguNETv0
             comboBoxAdaptador.SelectedItem = 0;
         }
 
-        private void crearMenu() 
-        {
-            DirectoryInfo d = new DirectoryInfo("scripts"); //Assuming Test is your Folder
-            ToolStripMenuItem fileItem = new ToolStripMenuItem("&File");
-
-            ToolStripMenuItem firstSubitem1 = new ToolStripMenuItem("Adaptadores de red", Image.FromFile("NetCard.ico"), menuAdaptadores);
-            ToolStripMenuItem firstSubitem2 = new ToolStripMenuItem("Scripts");
-            fileItem.DropDownItems.Add(firstSubitem1);
-            fileItem.DropDownItems.Add(firstSubitem2);
-
-            FileInfo[] Files = d.GetFiles("*.bat"); //Getting Text files
-            foreach (FileInfo file in Files)
-            {
-                ToolStripMenuItem subSubIte = new ToolStripMenuItem(file.Name, Image.FromFile("NetCard.ico"), menuClick);
-                firstSubitem2.DropDownItems.Add(subSubIte);
-            }
-            ToolStripMenuItem subSubItem1 = new ToolStripMenuItem("Scripts", Image.FromFile("NetCard.ico"), menuClick);
-
-            strip.Items.Add(fileItem);
-            this.Controls.Add(strip);
-        }
-
         private void showProfiles()
         {
             var startInfo = new ProcessStartInfo
@@ -378,18 +270,18 @@ namespace laguNETv0
                 RedirectStandardOutput = true,
             };
 
-        var p = Process.Start(startInfo);
-        p.WaitForExit();
-            //MessageBox.Show(p.StandardOutput.ReadToEnd());
-            var output = p.StandardOutput
-                .ReadToEnd()
-                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(line => line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries))
-                .Where(split => split.Length > 1)
-                .Select(split => split[1].Trim());
-        var reseaux = new ObservableCollection<string>(output);
+            var p = Process.Start(startInfo);
+            p.WaitForExit();
+                //MessageBox.Show(p.StandardOutput.ReadToEnd());
+                var output = p.StandardOutput
+                    .ReadToEnd()
+                    .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(line => line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries))
+                    .Where(split => split.Length > 1)
+                    .Select(split => split[1].Trim());
+            var reseaux = new ObservableCollection<string>(output);
 
-        comboBoxSSID.Items.Clear();            //comboBoxSSID.DataSource = null;
+            comboBoxSSID.Items.Clear();            //comboBoxSSID.DataSource = null;
             comboBoxSSID.ResetText();
             foreach (string s in reseaux)
             {
@@ -403,12 +295,6 @@ namespace laguNETv0
         private void checkBoxConectar_Click(object sender, EventArgs e)
         {
             comboBoxSSID.Enabled = checkBoxConectar.Checked;
-        }
-
-        private void button1_Click_1(object sender, EventArgs e)
-        {
-            string b = "/c netsh wlan connect name =\"" + comboBoxSSID.Text + "\" ssid =\"" + comboBoxSSID.Text + "\"";
-            cmdCommand(b);
         }
 
         private void buttonEXE_Click(object sender, EventArgs e)
@@ -438,7 +324,6 @@ namespace laguNETv0
             if (treeView.Nodes.Count > 0) 
                 treeView.SelectedNode = treeView.Nodes[0];
 
-            //treeView.SelectedNode = treeView.Nodes[0];
         }
 
         private static TreeNode CreateDirectoryNode(DirectoryInfo directoryInfo)
@@ -537,32 +422,11 @@ namespace laguNETv0
             }
         }
 
-
-        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
-        {
-            Form2 frm = new Form2();
-            frm.Location = new Point(Screen.PrimaryScreen.Bounds.Width - frm.Width, Screen.PrimaryScreen.Bounds.Height - frm.Height - 30);
-            frm.ShowInTaskbar = false;
-            frm.Show();
-        }
-
-        private void exeScript(string ruta) {
-            ProcessStartInfo psi = new ProcessStartInfo(ruta);
-            psi.UseShellExecute = true;
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.Verb = "runas";
-            //psi.Arguments = strCmd;
-            var p = Process.Start(psi);
-            p.WaitForExit();              
-        }
-
         private void treeViewScripts_AfterSelect(object sender, TreeViewEventArgs e)
         {
             string path = Application.StartupPath + "\\" + treeViewScripts.SelectedNode.FullPath.ToString();
             if (File.Exists(path))
-            {
                 leerArchivo(path);
-            }
         }
 
         private void richTextBoxScript_TextChanged(object sender, EventArgs e)
@@ -570,8 +434,6 @@ namespace laguNETv0
             buttonEXE.Enabled = (richTextBoxScript.Lines.Count() == 3);
             buttonGuardar.Enabled = (richTextBoxScript.Lines.Count() == 3);
         }
-
-
 
         private void textBoxNiIp_Enter(object sender, EventArgs e)
         {
@@ -640,9 +502,6 @@ namespace laguNETv0
                 String MenuItem1 = sr.ReadLine().Replace("MenuItem1=", "");
                 String MenuItem2 = sr.ReadLine().Replace("MenuItem2=", "");
                 String MenuItem3 = sr.ReadLine().Replace("MenuItem3=", "");
-                String MenuItem4 = sr.ReadLine().Replace("MenuItem4=", "");
-                String MenuItem5 = sr.ReadLine().Replace("MenuItem5=", "");
-                String MenuItem6 = sr.ReadLine().Replace("MenuItem6=", "");
                 label3.Text = sr.ReadLine().Replace("Text1=", "");
                 label1.Text = sr.ReadLine().Replace("Text2=", "");
                 label2.Text = sr.ReadLine().Replace("Text3=", "");
@@ -676,10 +535,29 @@ namespace laguNETv0
 
         }
 
-        private void label4_Click(object sender, EventArgs e)
-        {
+        //private void pBar() 
+        //{          
+        //    if (Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.IsPlatformSupported)
+        //    {
+        //        int maxProgressbarValue = 100;
+        //        var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
+        //        taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
 
-        }
+        //        for (int i = 0; i < maxProgressbarValue; i++)
+        //        {
+        //            taskbarInstance.SetProgressValue(i, maxProgressbarValue);
+        //            Thread.Sleep(50);
+        //        }
+
+        //        taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
+        //    }
+        //    else
+        //    {
+        //        // Platform does not support the feature.
+        //    }
+        //}
+
+
     }
 }
 

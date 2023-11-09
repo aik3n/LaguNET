@@ -7,7 +7,7 @@
 
 
 
-SCHTASKS /CREATE /SC ONLOGON /RL HIGHEST /TN "\LaguNET" /TR %~dp0laguNET.exe 
+SCHTASKS /CREATE /SC ONLOGON /RL HIGHEST /TN "\LaguNET" /TR " %~dp0laguNET.exe "
 
 Pause
 

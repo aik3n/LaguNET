@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+     
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.buttonCrear = new System.Windows.Forms.Button();
@@ -57,7 +58,7 @@
             // buttonCrear
             // 
             this.buttonCrear.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonCrear.Location = new System.Drawing.Point(226, 347);
+            this.buttonCrear.Location = new System.Drawing.Point(226, 357);
             this.buttonCrear.Name = "buttonCrear";
             this.buttonCrear.Size = new System.Drawing.Size(251, 32);
             this.buttonCrear.TabIndex = 2;
@@ -134,7 +135,7 @@
             // 
             this.buttonGuardar.Enabled = false;
             this.buttonGuardar.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonGuardar.Location = new System.Drawing.Point(226, 391);
+            this.buttonGuardar.Location = new System.Drawing.Point(226, 397);
             this.buttonGuardar.Name = "buttonGuardar";
             this.buttonGuardar.Size = new System.Drawing.Size(120, 32);
             this.buttonGuardar.TabIndex = 17;
@@ -188,7 +189,7 @@
             // 
             this.buttonEXE.Enabled = false;
             this.buttonEXE.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonEXE.Location = new System.Drawing.Point(357, 390);
+            this.buttonEXE.Location = new System.Drawing.Point(357, 396);
             this.buttonEXE.Name = "buttonEXE";
             this.buttonEXE.Size = new System.Drawing.Size(120, 32);
             this.buttonEXE.TabIndex = 28;
@@ -269,12 +270,11 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(462, 222);
+            this.label4.Location = new System.Drawing.Point(462, 218);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(15, 20);
             this.label4.TabIndex = 38;
             this.label4.Text = "*";
-            this.label4.Click += new System.EventHandler(this.label4_Click);
             this.label4.DoubleClick += new System.EventHandler(this.label4_DoubleClick);
             // 
             // Form1

@@ -18,7 +18,7 @@ namespace laguNETv0
     public partial class Form2 : Form
     {
         string sDirIP;
-        string MenuItem1, MenuItem2, MenuItem3, MenuItem4, MenuItem5, MenuItem6;
+        string MenuItem1, MenuItem2, MenuItem3;
         int intentos = 0;
         public Form2()
         {           
@@ -46,7 +46,7 @@ namespace laguNETv0
                     try
                     {
                         string[] l = lineRead.Split(',');
-                        if (l.Count() == 2) 
+                        if (lineRead.First() != ';' & l.Count() == 2) 
                         {
                             var menuItem = new MenuItem(l[0], new System.EventHandler(item_Click));
                             menuItem.Tag = l[1];// le paso el comando definido en menu.txt en la propiedad "tag", luego se usara la leer esta propiedad al clickar en el menu
@@ -61,8 +61,8 @@ namespace laguNETv0
             } 
             
             m_menu.MenuItems.Add("-");
-            m_menu.MenuItems.Add(new MenuItem(MenuItem5, new System.EventHandler(carpeta_scripts)));
-            m_menu.MenuItems.Add(new MenuItem(MenuItem6, new System.EventHandler(Exit_Click)));
+            m_menu.MenuItems.Add(new MenuItem(MenuItem2, new System.EventHandler(carpeta_scripts)));
+            m_menu.MenuItems.Add(new MenuItem(MenuItem3, new System.EventHandler(Exit_Click)));
 
 
             notifyIcon1.ContextMenu = m_menu;
@@ -79,28 +79,11 @@ namespace laguNETv0
             //MessageBox.Show(MI.Tag.ToString());
             exeCmd(MI.Tag.ToString());
         }
-        protected void adaptadores(Object sender, System.EventArgs e)
-        {
-            exeCmd("ncpa.cpl");
-            this.Hide();
-        }
-        protected void redesConocidas(Object sender, System.EventArgs e)
-        {
-            exeCmd("start ms-settings:network-wifisettings");
-            this.Hide();
-        }
         protected void carpeta_scripts(Object sender, System.EventArgs e)
         {
             exeCmd("explorer.exe " + Application.StartupPath.ToString() + "\\scripts");            //exeCmd("explorer.exe c:");
             this.Hide();
         }
-        protected void recibir_bt(Object sender, System.EventArgs e)
-        {
-            exeCmd("fsquirt.exe -receive");
-            this.Hide();
-        }
-
-
 
         protected void exeCmd(string s)
         {
@@ -167,8 +150,8 @@ namespace laguNETv0
                 string s = sDirIP.Replace(":: testPing=", "");
                 label1.Text = s;
                 
-                label1.BackColor = Color.LightCoral;
-                label1.Visible = true;
+                //label1.BackColor = Color.LightCoral;
+                //label1.Visible = true;
                 exeScript(path);
                 if(ValidateIPv4(s))
                     timer1.Start();
@@ -197,7 +180,7 @@ namespace laguNETv0
         {
             foreach (TreeNode theNode in theNodes)
             {
-                theNode.BackColor = Color.White;
+                theNode.BackColor = Color.FromArgb(192, 255, 192);
                 if (theNode.Nodes.Count > 0) resetColor(theNode.Nodes);
             }
         }
@@ -212,7 +195,7 @@ namespace laguNETv0
             {
                 if (ValidateIPv4(sDireccion))
                 {
-                    label1.Visible = true;
+                    //label1.Visible = true; // la quito por estetica
                     progressBar1.Visible = true;
                     progressBar1.Value = intentos;
                     try
@@ -227,13 +210,13 @@ namespace laguNETv0
                         }
                         else
                         {
-                            treeView1.SelectedNode.BackColor = Color.Coral;
+                            treeView1.SelectedNode.BackColor = Color.Khaki;
                             label1.BackColor = Color.Coral;//
                         }
                     }
                     catch (Exception ex)
                     {
-                        treeView1.SelectedNode.BackColor = Color.Coral;
+                        treeView1.SelectedNode.BackColor = Color.Khaki;
                         label1.BackColor = Color.Coral; //
                     }
                 }
@@ -315,7 +298,7 @@ namespace laguNETv0
         private void timerClose_Tick(object sender, EventArgs e)
         {
             timerClose.Stop();
-            //notifyIcon1.Icon = SystemIcons.Warning;
+            notifyIcon1.Text= "Ultima conexion: " + treeView1.SelectedNode.Text;
             notifyIcon1.BalloonTipTitle = "LaguNET";
             notifyIcon1.BalloonTipText = "Conexion OK: " + sDirIP.Replace(":: testPing=", "");
             notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
@@ -328,11 +311,8 @@ namespace laguNETv0
             {
                 StreamWriter sw = new StreamWriter(Application.StartupPath + "\\LaguNET.txt");
                 sw.WriteLine("MenuItem1=LaguNET Config");
-                sw.WriteLine("MenuItem2=Adaptadores de red");
-                sw.WriteLine("MenuItem3=Redes conocidas");
-                sw.WriteLine("MenuItem4=Recibir BT");
-                sw.WriteLine("MenuItem5=Carpeta Scripts");
-                sw.WriteLine("MenuItem6=Salir");
+                sw.WriteLine("MenuItem2=Carpeta Scripts");
+                sw.WriteLine("MenuItem3=Salir");
                 sw.WriteLine("Text1=Adaptador");
                 sw.WriteLine("Text2=IP");
                 sw.WriteLine("Text3=Mask");
@@ -361,9 +341,6 @@ namespace laguNETv0
                 MenuItem1 = sr.ReadLine().Replace("MenuItem1=", "");
                 MenuItem2 = sr.ReadLine().Replace("MenuItem2=", "");
                 MenuItem3 = sr.ReadLine().Replace("MenuItem3=", "");
-                MenuItem4 = sr.ReadLine().Replace("MenuItem4=", "");
-                MenuItem5 = sr.ReadLine().Replace("MenuItem5=", "");
-                MenuItem6 = sr.ReadLine().Replace("MenuItem6=", "");
                 sr.Close();
             }
             catch (Exception ex)
