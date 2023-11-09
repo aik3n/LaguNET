@@ -6,7 +6,7 @@ LaguNET creara (si no existe) una carpeta "Scripts" para guardar los archivos .b
 
 LaguNET creara (si no existe) un archivo "LaguNET.txt" para cambiar de idioma los textos.
 
-De manera opcional, se puede crar el archivo "Menu.txt" donde se pueden incluir accesos directos en el menu contextual con el siguiente formato:
+De manera opcional, se puede crear el archivo "Menu.txt" donde se pueden incluir accesos directos en el menu contextual con el siguiente formato:
 NombreMenu, Comando de consola deseado.
 
 Para crear una tarea programada para iniciar la aplcacion con el inicio de sesion de usuario ejecutar como administrador "Crear tarea programada.bat",
