@@ -22,6 +22,8 @@ using System.Windows.Shell;
 
 using System.Runtime.InteropServices;
 using System.Windows.Data;
+using System.Text.RegularExpressions;
+using System.Windows.Controls.Primitives;
 //using System.Windows;
 
 
@@ -30,27 +32,45 @@ namespace laguNETv0
 {
     public partial class Form1 : Form
     {
-        private ContextMenu m_menu;
-        MenuStrip strip = new MenuStrip();
 
+        int faderCount;
+        struct confSetting
+        {
+            public bool isStatic;
+            public string ip;
+            public string mask;
+
+        }
+        confSetting actConf;
         public Form1()
         {
             InitializeComponent();
             StartPosition = FormStartPosition.CenterScreen;
-            
+
         }
 
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            comboBoxAdaptador.SelectedIndexChanged += validarDatos;
             radioButtonDHCP.CheckedChanged += validarDatos;
             textBoxNiIp.TextChanged += validarDatos;
             textBoxNiMask.TextChanged += validarDatos;
+            textBoxNiIp.Leave += validarDatos;
+            textBoxNiMask.Leave += validarDatos;
+            textBoxNiIp.Enter += validarDatos;
+            textBoxNiMask.Enter += validarDatos;
             textBoxTestPing.TextChanged += validarDatos;
             checkBoxConectar.CheckedChanged += validarDatos;
             checkBoxTestPing.CheckedChanged += validarDatos;
+            comboBoxSSID.SelectedIndexChanged += validarDatos;
+            comboBoxSSID.MouseClick += validarDatos;
+
             validarDatos(sender, e);
             leer_archivo_traduccion();
+
+            buttonStatus.BackColor = Form1.DefaultBackColor;
+            buttonStatus.FlatAppearance.BorderSize = 0;
 
             buttonInfo.BackColor = Form1.DefaultBackColor;
             buttonInfo.FlatAppearance.BorderSize = 0;
@@ -58,7 +78,7 @@ namespace laguNETv0
             //crearMenu();
             listaAdapatadores();            // LISTA DE ADAPTADORES DE RED
             showProfiles();           // rellena el combobox con las SSID
-            //comboBoxAdaptador_SelectedIndexChanged(sender,e);
+
             comboBoxSSID.Enabled = checkBoxConectar.Checked;
             treeViewScripts.Focus();
            
@@ -73,32 +93,32 @@ namespace laguNETv0
             Ping HacerPing = new Ping();
             PingReply RespuestaPing;
             string sDireccion = richTextBoxScript.Lines[2].Replace(":: testPing=", "");
+            timerFade.Start();
+            //labelNombreScript.ForeColor = Color.FromArgb(faderCount, 0,0);
 
             if (ValidateIPv4(sDireccion)) {
-                treeViewScripts.SelectedNode.BackColor = Color.Coral;
+
+
                 try
-                {
-                    
+                {                   
                     RespuestaPing = HacerPing.Send(sDireccion, 500);
                     if (RespuestaPing.Status == IPStatus.Success)
                     {
-                        treeViewScripts.SelectedNode.BackColor = Color.LightGreen;
+                        //labelNombreScript.ForeColor = Color.LightGreen;
+                        buttonStatus.BackColor = Color.LawnGreen;
                         timerPing.Stop();
+                        timerFade.Stop();
                     }
-                    else
-                    {
-                        treeViewScripts.SelectedNode.BackColor = Color.Coral;
-                    }
+
                 }
                 catch (Exception ex)
                 {
-                    treeViewScripts.SelectedNode.BackColor = Color.Coral;
+
                 }
             }
             else
             {
-                timerPing.Stop();
-                treeViewScripts.SelectedNode.BackColor = Color.SkyBlue;
+
             }
         }
 
@@ -115,40 +135,7 @@ namespace laguNETv0
 
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //if (e.CloseReason == CloseReason.UserClosing)
-            //{
-            //    notifyIcon1.Visible = true;
-            //    this.Hide();
-            //    e.Cancel = true;
-            //}
-            //if (this.Visible) {
-            //    this.Hide();
-            //    e.Cancel = true;
-            //} else {
-            //    Close();
-            //}
-        }
-
-
-        private void Form1_Resize(object sender, EventArgs e)
-        {
-            //if (FormWindowState.Minimized == WindowState)
-            //    Hide();
-
-            //if (FormWindowState.Minimized == this.WindowState)
-            //{
-            //    Hide();
-            //}
-            //else if (FormWindowState.Normal == this.WindowState)
-            //{
-
-            //    Show();
-            //}
-        }
-
-        private void buttonCrear_Click(object sender, EventArgs e)
+        private void rellenarScript()
         {
             string s, b, l;
 
@@ -159,22 +146,23 @@ namespace laguNETv0
 
             if (checkBoxConectar.Checked)
                 b = "netsh wlan connect name =\"" + comboBoxSSID.Text + "\" ssid =\"" + comboBoxSSID.Text + "\"";
-            else 
+            else
                 b = ":: No conectar ";
 
-            if (checkBoxTestPing.Checked) 
+            if (checkBoxTestPing.Checked)
                 l = ":: testPing=" + textBoxTestPing.Text;
-            else 
+            else
                 l = ":: No test Ping";
-
+            labelNombreScript.Text = "Script:";
+            //labelNombreScript.ForeColor = Color.Black;
+            buttonStatus.BackColor = Form1.DefaultBackColor;
             richTextBoxScript.Text = s + "\n" + b + "\n" + l;
-
         }
-
         private void radioButtonDHCP_CheckedChanged(object sender, EventArgs e)
         {
             textBoxNiIp.Enabled = !radioButtonDHCP.Checked;
             textBoxNiMask.Enabled = !radioButtonDHCP.Checked;
+
             textBoxNiIp.BackColor = Color.White;
             textBoxNiMask.BackColor = Color.White;
         }
@@ -183,9 +171,8 @@ namespace laguNETv0
         {
             string dir = "scripts"; // If directory does not exist, create it.
             if (!Directory.Exists(dir))
-            {
                 Directory.CreateDirectory(dir);
-            }
+
             SaveFileDialog saveFileDialog1 = new SaveFileDialog() {
                 Filter = "Batch script|*.bat|Texto plano|*.txt",
                 Title = "Guardar script",
@@ -197,8 +184,8 @@ namespace laguNETv0
             if (saveFileDialog1.FileName.ToString() != "") 
             { 
                 StreamWriter sw = new StreamWriter(saveFileDialog1.FileName.ToString());         
-                sw.WriteLine(richTextBoxScript.Text); //Write a line of text
-                sw.Close(); //Close the file
+                sw.WriteLine(richTextBoxScript.Text); 
+                sw.Close(); 
             }
             ListDirectory(treeViewScripts, dir);
 
@@ -242,6 +229,9 @@ namespace laguNETv0
                 richTextBoxScript.AppendText(sr.ReadLine() + "\n");
                 richTextBoxScript.AppendText(sr.ReadLine()); 
                 sr.Close();
+                labelNombreScript.Text = ruta.Split('\\').Last();
+                buttonStatus.BackColor = Form1.DefaultBackColor;
+                //labelNombreScript.ForeColor = Color.Black;
             }
 
         }
@@ -255,6 +245,7 @@ namespace laguNETv0
                     AdapterList.Add(nic.Name);
                 }
             }
+            //AdapterList.Add("");// para seleccionarlo cunado ,al leer un script no exite el adaptador
             comboBoxAdaptador.DataSource = AdapterList;
             comboBoxAdaptador.SelectedItem = 0;
         }
@@ -287,6 +278,7 @@ namespace laguNETv0
             {
                 comboBoxSSID.Items.Add(s);
             }
+            //comboBoxSSID.Items.Add(""); // para seleccionarlo cunado ,al leer un script no exite la SSID
             if (comboBoxSSID.Items.Count > 0)
                 comboBoxSSID.SelectedIndex = 0;            //MessageBox.Show(reseaux[1]);
 
@@ -307,11 +299,19 @@ namespace laguNETv0
             cmdCommand(s);
             cmdCommand(v);
 
-            treeViewScripts.SelectedNode.BackColor = Color.SkyBlue;
-            if (ValidateIPv4(g))
-                timerPing.Start();
-            else
-                timerPing.Stop();
+            if (!g.Contains("No"))
+            {
+                if (ValidateIPv4(g))
+                    timerPing.Start();
+                else
+                    timerPing.Stop();
+            }
+            else 
+            {
+                //labelNombreScript.ForeColor = Color.Blue;
+                buttonStatus.BackColor = Color.Turquoise;
+            }
+
 
         }
 
@@ -343,39 +343,38 @@ namespace laguNETv0
 
             foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
             {
-                if (nic.Name == comboBoxAdaptador.SelectedItem.ToString()) //if (nic.Name == listBox1.SelectedItem.ToString())
+                if (nic.Name == comboBoxAdaptador.SelectedItem.ToString()) 
                 {
                     bool IsDhcpEnabled = nic.GetIPProperties().GetIPv4Properties().IsDhcpEnabled;
-                    //textBoxNiName.Text = nic.Name.ToString();
-                    radioButtonDHCP.Checked = IsDhcpEnabled;
-                    radioButtonStatic.Checked = !IsDhcpEnabled;
-                    textBoxNiIp.Enabled = !IsDhcpEnabled;
-                    textBoxNiMask.Enabled = !IsDhcpEnabled;
+                    actConf.isStatic = !IsDhcpEnabled;
+
                     foreach (UnicastIPAddressInformation address in nic.GetIPProperties().UnicastAddresses)
                     {
-                        if (address.Address.AddressFamily == AddressFamily.InterNetwork)
-                            textBoxNiIp.Text = address.Address.ToString();
-                        textBoxNiMask.Text = address.IPv4Mask.ToString();
+                        if (address.Address.AddressFamily == AddressFamily.InterNetwork) 
+                            actConf.ip = address.Address.ToString();
+                        actConf.mask = address.IPv4Mask.ToString();
                     }
 
                 }
 
             }
+
+            radioButtonDHCP.Checked = !actConf.isStatic;
+            radioButtonStatic.Checked = actConf.isStatic;
+            textBoxNiIp.Enabled = actConf.isStatic;
+            textBoxNiMask.Enabled = actConf.isStatic;
+            textBoxNiIp.Text = actConf.ip;
+            textBoxNiMask.Text = actConf.mask;
+
+
         }
 
         private void checkBoxTestPing_CheckedChanged(object sender, EventArgs e)
         {
-            if (ValidateIPv4(textBoxTestPing.Text))
-                textBoxTestPing.BackColor  = Color.White;
-            else
-                textBoxTestPing.BackColor  = Color.Coral;
-
-            if (checkBoxTestPing.Checked)
-                textBoxTestPing.Enabled = true;
-            else
+            if (checkBoxTestPing.Checked & ValidateIPv4(textBoxNiIp.Text))
             {
-                textBoxTestPing.Enabled = false;
-                textBoxTestPing.BackColor = Color.White;
+                string[] l = textBoxNiIp.Text.Split('.');     //string f = textBoxNiIp.Text.Split('.')[2];                
+                textBoxTestPing.Text = l[0] + "." + l[1] + "." + l[2] + ".1";
             }
 
         }
@@ -383,14 +382,36 @@ namespace laguNETv0
         public void validarDatos(object sender, EventArgs e)
         {
             bool datosOK;
-            bool ipOK = ValidateIPv4(textBoxNiIp.Text);
-            bool maskOK = ValidateIPv4(textBoxNiMask.Text);
-            bool dirOK = radioButtonDHCP.Checked | (ipOK & maskOK);
+            bool adaptadorOK = comboBoxAdaptador.Text != "";
+            bool dirOK = radioButtonDHCP.Checked | (ValidateIPv4(textBoxNiIp.Text) & ValidateIPv4(textBoxNiMask.Text));
             bool testPingOK = !checkBoxTestPing.Checked | ValidateIPv4(textBoxTestPing.Text);
             bool conectarOK = !checkBoxConectar.Checked | comboBoxSSID.Text != "";
 
-            datosOK = dirOK & testPingOK & conectarOK;
-            buttonCrear.Enabled = datosOK;
+            datosOK = adaptadorOK & dirOK & testPingOK & conectarOK;
+
+            if (radioButtonStatic.Checked & !ValidateIPv4(textBoxNiIp.Text))
+                textBoxNiIp.BackColor = Color.Coral;
+            else
+                textBoxNiIp.BackColor = Color.White;
+
+            if (radioButtonStatic.Checked & !ValidateIPv4(textBoxNiMask.Text))
+                textBoxNiMask.BackColor = Color.Coral;
+            else
+                textBoxNiMask.BackColor = Color.White;
+
+            if (checkBoxTestPing.Checked & !ValidateIPv4(textBoxTestPing.Text))
+                textBoxTestPing.BackColor = Color.Coral;
+            else
+                textBoxTestPing.BackColor = Color.White;
+
+
+            textBoxTestPing.Enabled = checkBoxTestPing.Checked;
+
+            if (datosOK)
+            {
+                rellenarScript();
+            }
+
 
         }
         public bool ValidateIPv4(string ipString)
@@ -431,56 +452,34 @@ namespace laguNETv0
 
         private void richTextBoxScript_TextChanged(object sender, EventArgs e)
         {
+            timerPing.Stop();
+            timerFade.Stop();
             buttonEXE.Enabled = (richTextBoxScript.Lines.Count() == 3);
             buttonGuardar.Enabled = (richTextBoxScript.Lines.Count() == 3);
         }
 
         private void textBoxNiIp_Enter(object sender, EventArgs e)
         {
-            textBoxNiIp.BackColor = Color.White;
+            //textBoxNiIp.BackColor = Color.White;
         }
         private void textBoxNiIp_Leave(object sender, EventArgs e)
         {
-            if (!ValidateIPv4(textBoxNiIp.Text) & radioButtonStatic.Checked)
+        // https://asp-blogs.azurewebsites.net/razan/finding-subnet-mask-from-ip4-address-using-c
+            if (textBoxNiMask.Text == "")
             {
-                textBoxNiIp.BackColor = Color.Coral;
+                string r = textBoxNiIp.Text.Split('.')[0];
+                int n = int.Parse(r);
+                if (n >= 0 & n <= 127)
+                    textBoxNiMask.Text = "255.0.0.0";
+                else if (n >= 128 & n <= 191)
+                    textBoxNiMask.Text = "255.255.0.0";
+                else if(n >= 192 & n <= 223)
+                    textBoxNiMask.Text = "255.255.255.0";
+                else
+                    textBoxNiMask.Text = "0.0.0.0";
             }
-            else
-            {
-                textBoxNiIp.BackColor = Color.White;
-            }
         }
 
-        private void textBoxNiMask_Enter(object sender, EventArgs e)
-        {
-            textBoxNiMask.BackColor = Color.White;
-        }
-
-        private void textBoxNiMask_Leave(object sender, EventArgs e)
-        {
-            if (!ValidateIPv4(textBoxNiMask.Text) & radioButtonStatic.Checked)
-            {
-                textBoxNiMask.BackColor = Color.Coral;
-            }
-            else
-            {
-                textBoxNiMask.BackColor = Color.White;
-            }
-
-        }
-
-        private void textBoxTestPing_Enter(object sender, EventArgs e)
-        {
-            textBoxTestPing.BackColor = Color.White;
-        }
-
-        private void textBoxTestPing_Leave(object sender, EventArgs e)
-        {
-            if (!ValidateIPv4(textBoxTestPing.Text) & checkBoxTestPing.Checked)
-                textBoxTestPing.BackColor = Color.Coral;
-            else
-                textBoxTestPing.BackColor = Color.White;
-        }
 
         private void buttonInfo_Click(object sender, EventArgs e)
         {
@@ -507,9 +506,8 @@ namespace laguNETv0
                 label2.Text = sr.ReadLine().Replace("Text3=", "");
                 checkBoxConectar.Text = sr.ReadLine().Replace("Text4=", "");
                 checkBoxTestPing.Text = sr.ReadLine().Replace("Text5=", "");
-                buttonCrear.Text = sr.ReadLine().Replace("Button1=", "");
-                buttonGuardar.Text = sr.ReadLine().Replace("Button2=", "");
-                buttonEXE.Text = sr.ReadLine().Replace("Button3=", "");
+                buttonGuardar.Text = sr.ReadLine().Replace("Button1=", "");
+                buttonEXE.Text = sr.ReadLine().Replace("Button2=", "");
                 sr.Close();
             }
             catch (Exception ex)
@@ -518,7 +516,92 @@ namespace laguNETv0
             }
         }
 
-        private void label4_DoubleClick(object sender, EventArgs e)
+        private void obtenerDatosScript(string st)
+        {
+            Console.WriteLine("Exception: ");
+            try
+            {
+                StreamReader sr = new StreamReader(Application.StartupPath + "\\" + st);
+                string l1 = sr.ReadLine();
+                string l2 = sr.ReadLine();
+                string l3 = sr.ReadLine();
+                string txt = st;
+                sr.Close();
+                string sAdaptador = "", sIp = "", sMask = "", sConectarRedNombre = "", sTestIpPing = "";
+                bool bModoStatic = false, bConectarRed = false, bTestPing = false;
+
+
+                if (l1.Contains("\""))
+                {
+                    var reg = new Regex("\".*?\"");
+                    var v1 = reg.Matches(l1);
+                    sAdaptador = v1[0].ToString().Replace("\"","");
+                }
+                else
+                {
+                    sAdaptador = "no adaptador";
+                }
+
+                bModoStatic = l1.ToLower().Contains("static");
+                if (bModoStatic)
+                {
+                    radioButtonDHCP.Checked = !bModoStatic;
+                    radioButtonStatic.Checked = bModoStatic;
+
+                    string[] lista = l1.Split(' ');
+                    sIp   = lista[7];
+                    sMask = lista[8];
+                }
+                else
+                {
+                    radioButtonDHCP.Checked = !bModoStatic;
+                    radioButtonStatic.Checked = bModoStatic;
+                }
+
+                bConectarRed = l2.Contains("\"");
+                if (bConectarRed){
+                    var reg = new Regex("\".*?\"");
+                    var v2 = reg.Matches(l2);
+                    sConectarRedNombre = v2[0].ToString().Replace("\"", "");
+                }
+
+                bTestPing = l3.Contains("=");
+                if (bTestPing)
+                {
+                    sTestIpPing = l3.Replace(":: testPing=", "");
+                }
+
+                // para saber si un string existe en la lista del combobox
+                bool isValid = comboBoxAdaptador.Items.Cast<Object>().Any(x => comboBoxAdaptador.GetItemText(x) == sAdaptador);
+                if (isValid)
+                    comboBoxAdaptador.Text = sAdaptador;
+                else
+                    comboBoxAdaptador.Text = "";
+                radioButtonDHCP.Checked = !bModoStatic;
+                radioButtonStatic.Checked = bModoStatic;
+                if (!bModoStatic)
+                    textBoxNiIp.Clear(); ; textBoxNiMask.Clear();
+                textBoxNiIp.Text = sIp;
+                textBoxNiMask.Text = sMask;
+                checkBoxConectar.Checked = bConectarRed;
+                if (bConectarRed)
+                    comboBoxSSID.Text = sConectarRedNombre;
+                else
+                    comboBoxSSID.Text = "";
+                checkBoxTestPing.Checked = bTestPing;
+                if (bTestPing)
+                    textBoxTestPing.Text = sTestIpPing;
+                else
+                    textBoxTestPing.Clear();
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception: " + ex.Message);
+            }
+        }
+        private void labelKeyClear_DoubleClick(object sender, EventArgs e)
         {
             var startInfo = new ProcessStartInfo
             {
@@ -534,30 +617,44 @@ namespace laguNETv0
             MessageBox.Show(p.StandardOutput.ReadToEnd());
 
         }
+        private void labelIpConfig_DoubleClick(object sender, EventArgs e)
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                //netsh interface ip show addresses "Ethernet"
+                FileName = Path.Combine(Environment.SystemDirectory, "netsh.exe"),
+                Arguments = "interface ip show addresses name=\"" + comboBoxAdaptador.Text + "\"",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                Verb = "runas",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+            };
+            var p = Process.Start(startInfo);
+            p.WaitForExit();
+            MessageBox.Show(p.StandardOutput.ReadToEnd());
+        }
 
-        //private void pBar() 
-        //{          
-        //    if (Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.IsPlatformSupported)
-        //    {
-        //        int maxProgressbarValue = 100;
-        //        var taskbarInstance = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
-        //        taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.Normal);
-
-        //        for (int i = 0; i < maxProgressbarValue; i++)
-        //        {
-        //            taskbarInstance.SetProgressValue(i, maxProgressbarValue);
-        //            Thread.Sleep(50);
-        //        }
-
-        //        taskbarInstance.SetProgressState(Microsoft.WindowsAPICodePack.Taskbar.TaskbarProgressBarState.NoProgress);
-        //    }
-        //    else
-        //    {
-        //        // Platform does not support the feature.
-        //    }
-        //}
+        private void timerFade_Tick(object sender, EventArgs e)
+        {
+            if (faderCount > 30)
+            {
+                faderCount -= 2;
+                //labelNombreScript.ForeColor = Color.FromArgb(faderCount, 0, 0);
+                buttonStatus.BackColor = Color.FromArgb(faderCount, 0, 0);
+                if (faderCount < 120)
+                    faderCount -= 10;
+            }
+            else
+                faderCount = 255;
 
 
+
+        }
+
+        private void treeViewScripts_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            buttonEXE_Click(sender, e);
+        }
     }
 }
 

@@ -108,7 +108,8 @@ namespace laguNETv0
         {
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
             labelVersion.Text = version;
-            textBoxDescription.Text = "Esta aplicacion ha sido creada para facilitar la gestion de las redes.";
+            textBoxDescription.Text = "Esta aplicacion ha sido creada para facilitar \n " +
+                                      "la configuracion de los adaptadores de red.";
         }
 
         private void okButton_Click(object sender, EventArgs e)

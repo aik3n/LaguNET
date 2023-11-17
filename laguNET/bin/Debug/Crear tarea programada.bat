@@ -5,26 +5,53 @@
 :: Directorio del .bat cuando se ejecuta como admin
 ::echo %~dp0
 
-::color 02
-::mode con cols=100 lines=20
 
-SCHTASKS /CREATE /SC ONLOGON /RL HIGHEST /TN "\LaguNET" /TR " %~dp0laguNET.exe " /RU SYSTEM
 @echo off
-echo ------------------------------------------------------------------------------
-echo A continuacion se abrira el programador de tareas...
-echo .
-echo Configurar programador de tareas:
-echo Paso 1. Doble click en la tarea "LaguNET" para editar
-echo Paso 2. en el apartado "condiciones" 
-echo Paso 3. desclickar opciones de energia 
-echo Paso 4. Guardar 
-echo ------------------------------------------------------------------------------
-echo.
+echo INFORMACION:
+echo - EJECUTAR EN MODO ADMINISTRADOR
+echo - NO FUNCIONA CON LAS RUTAS CON ESPACIOS EN BLANCO
+PAUSE
+@echo on
+
+:: Se crea una tarea programada al iniciar usuario, 
+:: por defecto esta activado la opcion "No iniciar solo si estas enchufado"
+SCHTASKS /CREATE /SC ONLOGON /RL HIGHEST /TN "\LaguNET" /TR "%~dp0laguNET.exe"
+
+:: Exportar la tarea a xml
+SCHTASKS /QUERY /XML /TN "\LaguNET" >> "%~dp0laguNET.xml"
+
+:: Borrar la tarea sin preguntar
+SCHTASKS /DELETE /TN "\LaguNET" /F
+
+
+:: Se modifica el .xml para quitar la opcion "No iniciar solo si estas enchufado"
+:: se crea un nuevo .xml modificado
+@echo off
+setlocal EnableDelayedExpansion
+
+set file=%~dp0laguNET.xml
+
+(for /F "delims=" %%a in ('type "%file%"') do (
+   set "line=%%a"
+   set "newLine=!line:DisallowStartIfOnBatteries>=!"
+   if "!newLine!" neq "!line!" (
+      set "newLine=<DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>"
+   )
+   echo !newLine!
+)) > "%~dp0laguNET2.xml"
+
+:: Se importa la tarea desde el .xml modificado
+SCHTASKS /CREATE /XML "%~dp0laguNET2.xml" /TN "\LaguNET" 
+
+:: Se borran los .xml que ya no hacen falta
+DEL "%~dp0laguNET.xml"
+DEL "%~dp0laguNET2.xml"
+
 pause
-
-taskschd.msc /s
-
 
 :: RECURSOS
 :: https://www.windowscentral.com/how-create-task-using-task-scheduler-command-prompt
+:: https://stackoverflow.com/questions/17054275/changing-tag-data-in-an-xml-file-using-windows-batch-file
 :: https://www.tenforums.com/general-support/168101-batch-run-admin-current-path-instead-system32-folder.html
+:: https://stackoverflow.com/questions/5553040/batch-file-for-loop-with-spaces-in-dir-name
+

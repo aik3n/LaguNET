@@ -146,21 +146,32 @@ namespace laguNETv0
             if (File.Exists(path))
             {
                 resetColor(treeView1.Nodes);
-                //treeView1.SelectedNode.BackColor = Color.LightCoral;
                 string s = sDirIP.Replace(":: testPing=", "");
-                label1.Text = "Ping: " + s;
-                
-                //label1.BackColor = Color.LightCoral;
-                label1.Visible = true;
+
                 exeScript(path);
-                if(ValidateIPv4(s))
-                    timer1.Start();
-                else
+                if (!sDirIP.Contains("No"))
                 {
-                    treeView1.SelectedNode.BackColor = Color.SkyBlue;
-                    label1.Text = "IP no valida: " + s;
-                    label1.BackColor = Color.Yellow;
+                    label1.Text = "Ping: " + s;               
+                    label1.Visible = true;
+                    if (ValidateIPv4(s))
+                        timer1.Start();
+                    else
+                    {
+                        treeView1.SelectedNode.BackColor = Color.SkyBlue;
+                        label1.Text = "IP no valida: " + s;
+                    }
                 }
+                else // si no se hace ping cierra directamente
+                {
+                    this.Hide();
+                    notifyIcon1.Text = "Ultima configuracion: " + treeView1.SelectedNode.Text;
+                    notifyIcon1.BalloonTipTitle = "LaguNET";
+                    notifyIcon1.BalloonTipText = "Datos cambiados";
+                    notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
+                    notifyIcon1.ShowBalloonTip(1000);
+
+                }
+
                     
                     
             }
@@ -181,7 +192,7 @@ namespace laguNETv0
         {
             foreach (TreeNode theNode in theNodes)
             {
-                theNode.BackColor = Color.FromArgb(192, 255, 192);
+                theNode.BackColor = Color.White; //Color.FromArgb(192, 255, 192);
                 if (theNode.Nodes.Count > 0) resetColor(theNode.Nodes);
             }
         }
@@ -205,20 +216,17 @@ namespace laguNETv0
                         if (RespuestaPing.Status == IPStatus.Success)
                         {
                             treeView1.SelectedNode.BackColor = Color.LightGreen;
-                            //label1.BackColor = Color.LightGreen;//
                             timer1.Stop();
                             timerClose.Start();
                         }
                         else
                         {
                             treeView1.SelectedNode.BackColor = Color.Khaki;
-                            //label1.BackColor = Color.Coral;//
                         }
                     }
                     catch (Exception ex)
                     {
                         treeView1.SelectedNode.BackColor = Color.Khaki;
-                        //label1.BackColor = Color.Coral; //
                     }
                 }
             }
@@ -293,17 +301,19 @@ namespace laguNETv0
             label1.Visible = false;
             progressBar1.Visible = false;
             this.Hide();
-            //Visible= false;
 
         }
         private void timerClose_Tick(object sender, EventArgs e)
         {
             timerClose.Stop();
-            notifyIcon1.Text= "Ultima conexion: " + treeView1.SelectedNode.Text;
-            notifyIcon1.BalloonTipTitle = "LaguNET";
-            notifyIcon1.BalloonTipText = "Conexion OK: " + sDirIP.Replace(":: testPing=", "");
-            notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
-            notifyIcon1.ShowBalloonTip(1000);
+            if (!sDirIP.Contains("No"))
+            {
+                notifyIcon1.Text= "Ultima conexion: " + treeView1.SelectedNode.Text;
+                notifyIcon1.BalloonTipTitle = "LaguNET";
+                notifyIcon1.BalloonTipText = "Conexion OK: " + sDirIP.Replace(":: testPing=", "");
+                notifyIcon1.BalloonTipIcon = ToolTipIcon.Info;
+                notifyIcon1.ShowBalloonTip(1000);
+            }
             this.Hide();
         }
         private void escribir_archivo_traduccion()
@@ -319,9 +329,8 @@ namespace laguNETv0
                 sw.WriteLine("Text3=Mask");
                 sw.WriteLine("Text4=Conectar red");
                 sw.WriteLine("Text5=Test Ping");
-                sw.WriteLine("Button1=Crear Script");
-                sw.WriteLine("Button2=Guardar");
-                sw.WriteLine("Button3=EXE");
+                sw.WriteLine("Button1=Guardar");
+                sw.WriteLine("Button2=EXE");
                 sw.Close();
             }
             catch (Exception ex)
