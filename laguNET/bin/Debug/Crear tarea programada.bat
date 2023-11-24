@@ -11,7 +11,15 @@ echo INFORMACION:
 echo - EJECUTAR EN MODO ADMINISTRADOR
 echo - NO FUNCIONA CON LAS RUTAS CON ESPACIOS EN BLANCO
 PAUSE
+
+:: Borra todos los .xml por si estubieran ya creados
+::DEL "%~dp0laguNET.xml"
+::DEL "%~dp0laguNET2.xml"
+::DEL "%~dp0laguNET3.xml"
+DEL "%~dp0*.xml"
 @echo on
+
+
 
 :: Se crea una tarea programada al iniciar usuario, 
 :: por defecto esta activado la opcion "No iniciar solo si estas enchufado"
@@ -27,8 +35,11 @@ SCHTASKS /DELETE /TN "\LaguNET" /F
 :: Se modifica el .xml para quitar la opcion "No iniciar solo si estas enchufado"
 :: se crea un nuevo .xml modificado
 @echo off
-setlocal EnableDelayedExpansion
 
+::
+:: Edita la clave:  <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+::
+setlocal EnableDelayedExpansion
 set file=%~dp0laguNET.xml
 
 (for /F "delims=" %%a in ('type "%file%"') do (
@@ -40,13 +51,31 @@ set file=%~dp0laguNET.xml
    echo !newLine!
 )) > "%~dp0laguNET2.xml"
 
+
+::
+:: Edita la clave: <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
+::
+setlocal EnableDelayedExpansion
+set file=%~dp0laguNET2.xml
+
+(for /F "delims=" %%a in ('type "%file%"') do (
+   set "line=%%a"
+   set "newLine=!line:StopIfGoingOnBatteries>=!"
+   if "!newLine!" neq "!line!" (
+      set "newLine=<StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>"
+   )
+   echo !newLine!
+)) > "%~dp0laguNET3.xml"
+
+
 :: Se importa la tarea desde el .xml modificado
-SCHTASKS /CREATE /XML "%~dp0laguNET2.xml" /TN "\LaguNET" 
+SCHTASKS /CREATE /XML "%~dp0laguNET3.xml" /TN "\LaguNET" 
 
-:: Se borran los .xml que ya no hacen falta
-DEL "%~dp0laguNET.xml"
-DEL "%~dp0laguNET2.xml"
-
+:: Se borran todos los .xml que ya no hacen falta
+::DEL "%~dp0laguNET.xml"
+::DEL "%~dp0laguNET2.xml"
+::DEL "%~dp0laguNET3.xml"
+DEL "%~dp0*.xml"
 pause
 
 :: RECURSOS

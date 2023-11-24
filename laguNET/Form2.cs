@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 //using System.Windows.Controls;
@@ -23,6 +25,21 @@ namespace laguNETv0
         public Form2()
         {           
             InitializeComponent();
+            ImageList ilist = new ImageList();
+            ilist.ImageSize = new System.Drawing.Size(16, 16);
+       
+            string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\";
+        //
+            Icon folderIcon = Icon.ExtractAssociatedIcon(winDir + "explorer.exe"); //Icon folderIcon = Icon.ExtractAssociatedIcon(@"c:\windows\system32\explorer.exe");
+            ilist.Images.Add("folder", folderIcon);
+        //
+            Icon batIcon = Icon.ExtractAssociatedIcon(winDir + "\\System32\\cmd.exe");  //% windir %\system32\cmd.exe
+            ilist.Images.Add("batIco", batIcon);
+        //
+            Icon laguIcon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            ilist.Images.Add("lagun", laguIcon);
+
+            treeView1.ImageList = ilist;
         }
 
         private void Form2_Load(object sender, EventArgs e)
@@ -64,19 +81,13 @@ namespace laguNETv0
             m_menu.MenuItems.Add(new MenuItem(MenuItem2, new System.EventHandler(carpeta_scripts)));
             m_menu.MenuItems.Add(new MenuItem(MenuItem3, new System.EventHandler(Exit_Click)));
 
-
             notifyIcon1.ContextMenu = m_menu;
-            string dir = "scripts"; // If directory does not exist, create it.
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            ListDirectory(treeView1, Application.StartupPath + "\\scripts");
 
         }
+
         protected void item_Click(object sender, System.EventArgs e)
         {
             var MI = (MenuItem)sender;
-            //MessageBox.Show(MI.Tag.ToString());
             exeCmd(MI.Tag.ToString());
         }
         protected void carpeta_scripts(Object sender, System.EventArgs e)
@@ -102,7 +113,7 @@ namespace laguNETv0
 
         private void ListDirectory(TreeView treeView, string path)
         {
-            treeView.Nodes.Clear();
+            //treeView.Nodes.Clear();
             var rootDirectoryInfo = new DirectoryInfo(path);
             treeView.Nodes.Add(CreateDirectoryNode(rootDirectoryInfo));
             treeView.ExpandAll();
@@ -116,12 +127,36 @@ namespace laguNETv0
         {
             var directoryNode = new TreeNode(directoryInfo.Name);
             foreach (var directory in directoryInfo.GetDirectories())
-                directoryNode.Nodes.Add(CreateDirectoryNode(directory));
+            {
+                TreeNode n = CreateDirectoryNode(directory);
+                n.ImageKey = "folder";
+                n.SelectedImageKey = "folder";
+                directoryNode.Nodes.Add(n);
+            }
+                
             foreach (var file in directoryInfo.GetFiles())
-                directoryNode.Nodes.Add(new TreeNode(file.Name));
+            {
+                if (file.Name.ToLower().Contains("bat")) //solo muestro los .bat
+                {
+                    TreeNode n = new TreeNode(file.Name);
+                    //file.FullName
+                    if (file.FullName.ToLower().Contains("\\scripts\\"))
+                    {
+                        n.ImageKey = "lagun";
+                        n.SelectedImageKey = "lagun";
+                    }
+                    else
+                    {
+                        n.ImageKey = "batIco";
+                        n.SelectedImageKey = "batIco";
+                    }
+                    directoryNode.Nodes.Add(n); //directoryNode.Nodes.Add(new TreeNode(file.Name));
+                }
+
+            }
+
             return directoryNode;
         }
-
 
         private void mostrarCfg(object sender, EventArgs e)
         {
@@ -194,6 +229,10 @@ namespace laguNETv0
             {
                 theNode.BackColor = Color.White; //Color.FromArgb(192, 255, 192);
                 if (theNode.Nodes.Count > 0) resetColor(theNode.Nodes);
+                if (theNode.Text.ToLower().Contains("bat"))
+                    theNode.ImageKey = "lagun";
+                else
+                    theNode.ImageKey = "folder";
             }
         }
         private void timer1_Tick(object sender, EventArgs e)
@@ -279,6 +318,7 @@ namespace laguNETv0
             {
                 Form1 form = new Form1();
                 form.StartPosition = FormStartPosition.CenterScreen;
+                form.Focus();
                 form.Show();
             }
             else
@@ -289,8 +329,14 @@ namespace laguNETv0
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                ListDirectory(treeView1, Application.StartupPath + "\\scripts");
+                //ListDirectory(treeView1, Application.StartupPath + "\\scripts");
+                treeView1.Nodes.Clear();
+                foreach (var directory in Directory.GetDirectories(Application.StartupPath))
+                {
+                    ListDirectory(treeView1, directory);
+                }
                 BringToFront();
+                Focus();
                 Show();
                 treeView1.Focus();
             }
@@ -327,8 +373,9 @@ namespace laguNETv0
                 sw.WriteLine("Text1=Adaptador");
                 sw.WriteLine("Text2=IP");
                 sw.WriteLine("Text3=Mask");
-                sw.WriteLine("Text4=Conectar red");
-                sw.WriteLine("Text5=Test Ping");
+                sw.WriteLine("Text4=Gateway");
+                sw.WriteLine("Text5=Conectar red");
+                sw.WriteLine("Text6=Test Ping");
                 sw.WriteLine("Button1=Guardar");
                 sw.WriteLine("Button2=EXE");
                 sw.Close();

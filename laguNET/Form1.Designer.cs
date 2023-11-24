@@ -48,13 +48,17 @@
             this.checkBoxTestPing = new System.Windows.Forms.CheckBox();
             this.textBoxTestPing = new System.Windows.Forms.TextBox();
             this.treeViewScripts = new System.Windows.Forms.TreeView();
-            this.buttonInfo = new System.Windows.Forms.Button();
             this.labelKeyClear = new System.Windows.Forms.Label();
-            this.labelIpConfig = new System.Windows.Forms.Label();
             this.labelNombreScript = new System.Windows.Forms.Label();
             this.timerFade = new System.Windows.Forms.Timer(this.components);
             this.buttonStatus = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBoxNiGateway = new System.Windows.Forms.TextBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttonInfo = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBoxNiIp
@@ -70,7 +74,7 @@
             // textBoxNiMask
             // 
             this.textBoxNiMask.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxNiMask.Location = new System.Drawing.Point(6, 171);
+            this.textBoxNiMask.Location = new System.Drawing.Point(6, 164);
             this.textBoxNiMask.Name = "textBoxNiMask";
             this.textBoxNiMask.Size = new System.Drawing.Size(237, 23);
             this.textBoxNiMask.TabIndex = 9;
@@ -89,7 +93,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(2, 153);
+            this.label2.Location = new System.Drawing.Point(2, 146);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(36, 16);
             this.label2.TabIndex = 13;
@@ -138,7 +142,7 @@
             this.richTextBoxScript.Location = new System.Drawing.Point(6, 434);
             this.richTextBoxScript.Name = "richTextBoxScript";
             this.richTextBoxScript.ReadOnly = true;
-            this.richTextBoxScript.Size = new System.Drawing.Size(475, 59);
+            this.richTextBoxScript.Size = new System.Drawing.Size(519, 59);
             this.richTextBoxScript.TabIndex = 22;
             this.richTextBoxScript.Text = "";
             this.richTextBoxScript.TextChanged += new System.EventHandler(this.richTextBoxScript_TextChanged);
@@ -148,7 +152,7 @@
             this.comboBoxSSID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSSID.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSSID.FormattingEnabled = true;
-            this.comboBoxSSID.Location = new System.Drawing.Point(6, 238);
+            this.comboBoxSSID.Location = new System.Drawing.Point(6, 263);
             this.comboBoxSSID.Name = "comboBoxSSID";
             this.comboBoxSSID.Size = new System.Drawing.Size(251, 24);
             this.comboBoxSSID.TabIndex = 24;
@@ -166,7 +170,7 @@
             // 
             this.checkBoxConectar.AutoSize = true;
             this.checkBoxConectar.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxConectar.Location = new System.Drawing.Point(9, 212);
+            this.checkBoxConectar.Location = new System.Drawing.Point(9, 237);
             this.checkBoxConectar.Name = "checkBoxConectar";
             this.checkBoxConectar.Size = new System.Drawing.Size(100, 20);
             this.checkBoxConectar.TabIndex = 26;
@@ -216,7 +220,7 @@
             // 
             this.checkBoxTestPing.AutoSize = true;
             this.checkBoxTestPing.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkBoxTestPing.Location = new System.Drawing.Point(9, 282);
+            this.checkBoxTestPing.Location = new System.Drawing.Point(9, 292);
             this.checkBoxTestPing.Name = "checkBoxTestPing";
             this.checkBoxTestPing.Size = new System.Drawing.Size(79, 20);
             this.checkBoxTestPing.TabIndex = 33;
@@ -228,7 +232,7 @@
             // 
             this.textBoxTestPing.Enabled = false;
             this.textBoxTestPing.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxTestPing.Location = new System.Drawing.Point(5, 308);
+            this.textBoxTestPing.Location = new System.Drawing.Point(5, 318);
             this.textBoxTestPing.Name = "textBoxTestPing";
             this.textBoxTestPing.Size = new System.Drawing.Size(252, 23);
             this.textBoxTestPing.TabIndex = 34;
@@ -236,45 +240,23 @@
             // treeViewScripts
             // 
             this.treeViewScripts.Font = new System.Drawing.Font("Verdana", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.treeViewScripts.Location = new System.Drawing.Point(267, 12);
+            this.treeViewScripts.Location = new System.Drawing.Point(268, 9);
             this.treeViewScripts.Name = "treeViewScripts";
-            this.treeViewScripts.Size = new System.Drawing.Size(214, 416);
+            this.treeViewScripts.Size = new System.Drawing.Size(257, 416);
             this.treeViewScripts.TabIndex = 35;
             this.treeViewScripts.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewScripts_AfterSelect);
             this.treeViewScripts.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeViewScripts_NodeMouseDoubleClick);
-            // 
-            // buttonInfo
-            // 
-            this.buttonInfo.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
-            this.buttonInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonInfo.Location = new System.Drawing.Point(222, 13);
-            this.buttonInfo.Name = "buttonInfo";
-            this.buttonInfo.Size = new System.Drawing.Size(40, 42);
-            this.buttonInfo.TabIndex = 37;
-            this.buttonInfo.UseVisualStyleBackColor = true;
-            this.buttonInfo.Click += new System.EventHandler(this.buttonInfo_Click);
             // 
             // labelKeyClear
             // 
             this.labelKeyClear.AutoSize = true;
             this.labelKeyClear.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelKeyClear.Location = new System.Drawing.Point(242, 219);
+            this.labelKeyClear.Location = new System.Drawing.Point(242, 244);
             this.labelKeyClear.Name = "labelKeyClear";
             this.labelKeyClear.Size = new System.Drawing.Size(15, 20);
             this.labelKeyClear.TabIndex = 38;
             this.labelKeyClear.Text = "*";
             this.labelKeyClear.DoubleClick += new System.EventHandler(this.labelKeyClear_DoubleClick);
-            // 
-            // labelIpConfig
-            // 
-            this.labelIpConfig.AutoSize = true;
-            this.labelIpConfig.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelIpConfig.Location = new System.Drawing.Point(200, 11);
-            this.labelIpConfig.Name = "labelIpConfig";
-            this.labelIpConfig.Size = new System.Drawing.Size(15, 20);
-            this.labelIpConfig.TabIndex = 39;
-            this.labelIpConfig.Text = "*";
-            this.labelIpConfig.DoubleClick += new System.EventHandler(this.labelIpConfig_DoubleClick);
             // 
             // labelNombreScript
             // 
@@ -297,15 +279,60 @@
             this.buttonStatus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStatus.Location = new System.Drawing.Point(8, 488);
             this.buttonStatus.Name = "buttonStatus";
-            this.buttonStatus.Size = new System.Drawing.Size(471, 3);
+            this.buttonStatus.Size = new System.Drawing.Size(514, 3);
             this.buttonStatus.TabIndex = 42;
             this.buttonStatus.UseVisualStyleBackColor = true;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(2, 190);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(56, 16);
+            this.label4.TabIndex = 44;
+            this.label4.Text = "Gateway";
+            // 
+            // textBoxNiGateway
+            // 
+            this.textBoxNiGateway.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxNiGateway.Location = new System.Drawing.Point(6, 208);
+            this.textBoxNiGateway.Name = "textBoxNiGateway";
+            this.textBoxNiGateway.Size = new System.Drawing.Size(237, 23);
+            this.textBoxNiGateway.TabIndex = 43;
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(95, 26);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(94, 22);
+            this.editToolStripMenuItem.Text = "Edit";
+            // 
+            // buttonInfo
+            // 
+            this.buttonInfo.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.Control;
+            this.buttonInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonInfo.Location = new System.Drawing.Point(222, 13);
+            this.buttonInfo.Name = "buttonInfo";
+            this.buttonInfo.Size = new System.Drawing.Size(40, 42);
+            this.buttonInfo.TabIndex = 37;
+            this.buttonInfo.UseVisualStyleBackColor = true;
+            this.buttonInfo.Visible = false;
+            this.buttonInfo.Click += new System.EventHandler(this.buttonInfo_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(488, 499);
+            this.ClientSize = new System.Drawing.Size(529, 499);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.textBoxNiGateway);
             this.Controls.Add(this.buttonStatus);
             this.Controls.Add(this.labelNombreScript);
             this.Controls.Add(this.textBoxTestPing);
@@ -325,14 +352,15 @@
             this.Controls.Add(this.textBoxNiMask);
             this.Controls.Add(this.textBoxNiIp);
             this.Controls.Add(this.labelKeyClear);
-            this.Controls.Add(this.labelIpConfig);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
-            this.Text = "laguNET";
+            this.Text = "laguNET 1.2";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -357,12 +385,15 @@
         private System.Windows.Forms.CheckBox checkBoxTestPing;
         private System.Windows.Forms.TextBox textBoxTestPing;
         private System.Windows.Forms.TreeView treeViewScripts;
-        private System.Windows.Forms.Button buttonInfo;
         private System.Windows.Forms.Label labelKeyClear;
-        private System.Windows.Forms.Label labelIpConfig;
         private System.Windows.Forms.Label labelNombreScript;
         private System.Windows.Forms.Timer timerFade;
         private System.Windows.Forms.Button buttonStatus;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox textBoxNiGateway;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.Button buttonInfo;
     }
 }
 

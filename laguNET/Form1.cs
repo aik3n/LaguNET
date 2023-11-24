@@ -24,6 +24,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Data;
 using System.Text.RegularExpressions;
 using System.Windows.Controls.Primitives;
+//using System.Windows.Controls;
 //using System.Windows;
 
 
@@ -39,16 +40,43 @@ namespace laguNETv0
             public bool isStatic;
             public string ip;
             public string mask;
+            public string Gateway;
 
         }
         confSetting actConf;
         public Form1()
         {
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.HelpButton = true;
+            this.HelpButtonClicked += infoLagunet;
             InitializeComponent();
+
+
             StartPosition = FormStartPosition.CenterScreen;
+            ImageList il = new ImageList();
+            il.ImageSize = new System.Drawing.Size(16, 16);
+            Icon laguIcon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+            string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows) + "\\";
+            Icon folderIcon = Icon.ExtractAssociatedIcon(winDir + "explorer.exe");
+            //Icon folderIcon = Icon.ExtractAssociatedIcon(@"c:\windows\system32\explorer.exe");
 
+            il.Images.Add("folder", folderIcon);
+            il.Images.Add("lagun", laguIcon);
+            treeViewScripts.ImageList = il;
+            this.Focus();
         }
-
+        private void infoLagunet(object sender, CancelEventArgs e)
+        {
+            if (Application.OpenForms["AboutBox1"] == null)
+            {
+                AboutBox1 form = new AboutBox1();
+                form.StartPosition = FormStartPosition.CenterScreen;
+                form.Show();
+            }
+            else
+                Application.OpenForms["AboutBox1"].Focus();
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -56,8 +84,12 @@ namespace laguNETv0
             radioButtonDHCP.CheckedChanged += validarDatos;
             textBoxNiIp.TextChanged += validarDatos;
             textBoxNiMask.TextChanged += validarDatos;
+            textBoxNiGateway.TextChanged += validarDatos;
+
             textBoxNiIp.Leave += validarDatos;
             textBoxNiMask.Leave += validarDatos;
+            textBoxNiGateway.Leave += validarDatos;
+
             textBoxNiIp.Enter += validarDatos;
             textBoxNiMask.Enter += validarDatos;
             textBoxTestPing.TextChanged += validarDatos;
@@ -65,6 +97,8 @@ namespace laguNETv0
             checkBoxTestPing.CheckedChanged += validarDatos;
             comboBoxSSID.SelectedIndexChanged += validarDatos;
             comboBoxSSID.MouseClick += validarDatos;
+
+            contextMenuStrip1.MouseClick += contextMenuClick;
 
             validarDatos(sender, e);
             leer_archivo_traduccion();
@@ -75,17 +109,23 @@ namespace laguNETv0
             buttonInfo.BackColor = Form1.DefaultBackColor;
             buttonInfo.FlatAppearance.BorderSize = 0;
             buttonInfo.Image = SystemIcons.Question.ToBitmap();
-            //crearMenu();
+
             listaAdapatadores();            // LISTA DE ADAPTADORES DE RED
             showProfiles();           // rellena el combobox con las SSID
 
             comboBoxSSID.Enabled = checkBoxConectar.Checked;
             treeViewScripts.Focus();
            
-            string dir = Application.StartupPath + "\\scripts";
-            ListDirectory(treeViewScripts,dir);
+            ListDirectory(treeViewScripts, Application.StartupPath + "\\scripts");
 
+        }
 
+        private void crearMenu() 
+        {
+            //MenuItem myMenuItem = new MenuItem("Show Me");
+            //ContextMenu mnu = new ContextMenu();
+            //mnu.MenuItems.Add("Edit");
+            //myMenuItem.Click += new EventHandler(myMenuItem_Click);
         }
 
         private void timerPing_Tick(object sender, EventArgs e)
@@ -126,13 +166,14 @@ namespace laguNETv0
         {
             ProcessStartInfo psi = new ProcessStartInfo("cmd.exe");
             psi.UseShellExecute = true;
+            psi.RedirectStandardOutput = false;
             psi.WindowStyle = ProcessWindowStyle.Hidden;
             psi.Verb = "runas";
             psi.Arguments = strCmd;
+
             var p = Process.Start(psi);
             p.WaitForExit();
- 
-
+            // var output = p.StandardOutput.ReadToEnd();
         }
 
         private void rellenarScript()
@@ -142,7 +183,7 @@ namespace laguNETv0
             if (radioButtonDHCP.Checked)
                 s = "netsh interface ipv4 set address name=\"" + comboBoxAdaptador.Text + "\" source=dhcp";
             else
-                s = "netsh interface ipv4 set address name=\"" + comboBoxAdaptador.Text + "\" static " + textBoxNiIp.Text + " " + textBoxNiMask.Text;
+                s = "netsh interface ipv4 set address name=\"" + comboBoxAdaptador.Text + "\" static " + textBoxNiIp.Text + " " + textBoxNiMask.Text + " " + textBoxNiGateway.Text;
 
             if (checkBoxConectar.Checked)
                 b = "netsh wlan connect name =\"" + comboBoxSSID.Text + "\" ssid =\"" + comboBoxSSID.Text + "\"";
@@ -191,34 +232,7 @@ namespace laguNETv0
 
         }
 
-        private void conexionesDeRedToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            cmdCommand("/c ncpa.cpl");
-        }
 
-        private void menuClick(object sender, EventArgs e)
-        {
-            richTextBoxScript.Text = "";
-            String line;
-
-            string path = Application.StartupPath + "\\"   ;
-            
-            StreamReader sr = new StreamReader(path);
-            richTextBoxScript.Text = "";
-
-            line = sr.ReadLine();
-            richTextBoxScript.AppendText(line + "\n"); //cmdCommand(line);
-
-            while (line != null)    //Continue to read until you reach end of file
-            {
-                line = sr.ReadLine();
-                Debug.WriteLine(line);
-                richTextBoxScript.AppendText(line + "\n"); //cmdCommand(line);
-            }
-
-            sr.Close();
-
-        }
         private void leerArchivo(string ruta)
         {
             if (File.Exists(ruta))
@@ -321,26 +335,62 @@ namespace laguNETv0
             var rootDirectoryInfo = new DirectoryInfo(path);
             treeView.Nodes.Add(CreateDirectoryNode(rootDirectoryInfo));
             treeView.ExpandAll();
+
+            foreach (TreeNode RootNode in treeView.Nodes)
+            {
+                menuTree(RootNode.Nodes);
+            }
+
             if (treeView.Nodes.Count > 0) 
                 treeView.SelectedNode = treeView.Nodes[0];
 
         }
+        private void contextMenuClick(object sender, EventArgs e)
+        {
+            string f = Application.StartupPath + "\\" + treeViewScripts.SelectedNode.FullPath.ToString();
+            //MessageBox.Show(f);
+            if (File.Exists(f))
+                cmdCommand("/c notepad.exe \"" + f + "\"");
 
+        }
+        private void menuTree(TreeNodeCollection theNodes)
+        {
+            foreach (TreeNode theNode in theNodes)
+            {
+                if (theNode.Text.ToLower().Contains("bat"))
+                {
+                    theNode.ContextMenuStrip = contextMenuStrip1;
+                    theNode.ImageKey = "lagun";
+                    theNode.SelectedImageKey = "lagun";
+                }
+                else
+                {
+                    theNode.ImageKey = "folder";
+                    theNode.SelectedImageKey = "folder";
+                }
+
+                    
+                if (theNode.Nodes.Count > 0) menuTree(theNode.Nodes);
+            }
+        }
         private static TreeNode CreateDirectoryNode(DirectoryInfo directoryInfo)
         {
             var directoryNode = new TreeNode(directoryInfo.Name);
             foreach (var directory in directoryInfo.GetDirectories())
                 directoryNode.Nodes.Add(CreateDirectoryNode(directory));
             foreach (var file in directoryInfo.GetFiles())
-                directoryNode.Nodes.Add(new TreeNode(file.Name));
+                if (file.Name.ToLower().Contains("bat")) // filtro para mostrar solo los .bat
+                    directoryNode.Nodes.Add(new TreeNode(file.Name));
             return directoryNode;
         }
 
 
         private void comboBoxAdaptador_SelectedIndexChanged(object sender, EventArgs e)
         {
-            textBoxNiIp.Text = "";
-
+            actConf.ip = "";
+            actConf.mask = "";
+            actConf.Gateway = "";
+            
             foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (nic.Name == comboBoxAdaptador.SelectedItem.ToString()) 
@@ -353,11 +403,28 @@ namespace laguNETv0
                         if (address.Address.AddressFamily == AddressFamily.InterNetwork) 
                             actConf.ip = address.Address.ToString();
                         actConf.mask = address.IPv4Mask.ToString();
+                        
+                    }
+                    // pendiente coger la direccion de gateway // prueba
+                    foreach (GatewayIPAddressInformation address2 in nic.GetIPProperties().GatewayAddresses)
+                    {
+                        if (address2.Address.AddressFamily == AddressFamily.InterNetwork)
+                            actConf.Gateway = address2.Address.ToString();
                     }
 
                 }
 
             }
+            //NetworkInterface card = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault();
+            //if (card != null)
+            //{
+            //    GatewayIPAddressInformation address = card.GetIPProperties().GatewayAddresses.FirstOrDefault();
+            //    if (address != null)
+            //    {
+            //        textBoxNiGateway.Text = address.Address.ToString();
+            //    }
+            //}
+
 
             radioButtonDHCP.Checked = !actConf.isStatic;
             radioButtonStatic.Checked = actConf.isStatic;
@@ -365,6 +432,7 @@ namespace laguNETv0
             textBoxNiMask.Enabled = actConf.isStatic;
             textBoxNiIp.Text = actConf.ip;
             textBoxNiMask.Text = actConf.mask;
+            textBoxNiGateway.Text = actConf.Gateway;
 
 
         }
@@ -383,21 +451,29 @@ namespace laguNETv0
         {
             bool datosOK;
             bool adaptadorOK = comboBoxAdaptador.Text != "";
-            bool dirOK = radioButtonDHCP.Checked | (ValidateIPv4(textBoxNiIp.Text) & ValidateIPv4(textBoxNiMask.Text));
+            bool ipOK = ValidateIPv4(textBoxNiIp.Text);
+            bool maskOK = ValidateIPv4(textBoxNiMask.Text);
+            bool gatewayOK = (ValidateIPv4(textBoxNiGateway.Text)) | textBoxNiGateway.Text =="";
+            bool dirOK = radioButtonDHCP.Checked | (ipOK & maskOK & gatewayOK);
             bool testPingOK = !checkBoxTestPing.Checked | ValidateIPv4(textBoxTestPing.Text);
             bool conectarOK = !checkBoxConectar.Checked | comboBoxSSID.Text != "";
 
             datosOK = adaptadorOK & dirOK & testPingOK & conectarOK;
 
-            if (radioButtonStatic.Checked & !ValidateIPv4(textBoxNiIp.Text))
+            if (radioButtonStatic.Checked & !ipOK)
                 textBoxNiIp.BackColor = Color.Coral;
             else
                 textBoxNiIp.BackColor = Color.White;
 
-            if (radioButtonStatic.Checked & !ValidateIPv4(textBoxNiMask.Text))
+            if (radioButtonStatic.Checked & !maskOK)
                 textBoxNiMask.BackColor = Color.Coral;
             else
                 textBoxNiMask.BackColor = Color.White;
+
+            if (radioButtonStatic.Checked & !gatewayOK)
+                textBoxNiGateway.BackColor = Color.Coral;
+            else
+                textBoxNiGateway.BackColor = Color.White;
 
             if (checkBoxTestPing.Checked & !ValidateIPv4(textBoxTestPing.Text))
                 textBoxTestPing.BackColor = Color.Coral;
@@ -410,6 +486,10 @@ namespace laguNETv0
             if (datosOK)
             {
                 rellenarScript();
+            }
+            else
+            {
+                richTextBoxScript.Text = ":: Null\n:: Null\n:: Null";
             }
 
 
@@ -446,6 +526,7 @@ namespace laguNETv0
         private void treeViewScripts_AfterSelect(object sender, TreeViewEventArgs e)
         {
             string path = Application.StartupPath + "\\" + treeViewScripts.SelectedNode.FullPath.ToString();
+            //MessageBox.Show(path);
             if (File.Exists(path))
                 leerArchivo(path);
         }
@@ -483,14 +564,14 @@ namespace laguNETv0
 
         private void buttonInfo_Click(object sender, EventArgs e)
         {
-            if (Application.OpenForms["AboutBox1"] == null)
-            {
-                AboutBox1 form = new AboutBox1();
-                form.StartPosition = FormStartPosition.CenterScreen;
-                form.Show();
-            }
-            else
-                Application.OpenForms["AboutBox1"].Focus();
+            //if (Application.OpenForms["AboutBox1"] == null)
+            //{
+            //    AboutBox1 form = new AboutBox1();
+            //    form.StartPosition = FormStartPosition.CenterScreen;
+            //    form.Show();
+            //}
+            //else
+            //    Application.OpenForms["AboutBox1"].Focus();
 
         }
         private void leer_archivo_traduccion()
@@ -504,8 +585,9 @@ namespace laguNETv0
                 label3.Text = sr.ReadLine().Replace("Text1=", "");
                 label1.Text = sr.ReadLine().Replace("Text2=", "");
                 label2.Text = sr.ReadLine().Replace("Text3=", "");
-                checkBoxConectar.Text = sr.ReadLine().Replace("Text4=", "");
-                checkBoxTestPing.Text = sr.ReadLine().Replace("Text5=", "");
+                label4.Text = sr.ReadLine().Replace("Text4=", "");
+                checkBoxConectar.Text = sr.ReadLine().Replace("Text5=", "");
+                checkBoxTestPing.Text = sr.ReadLine().Replace("Text6=", "");
                 buttonGuardar.Text = sr.ReadLine().Replace("Button1=", "");
                 buttonEXE.Text = sr.ReadLine().Replace("Button2=", "");
                 sr.Close();
@@ -655,6 +737,7 @@ namespace laguNETv0
         {
             buttonEXE_Click(sender, e);
         }
+
     }
 }
 
